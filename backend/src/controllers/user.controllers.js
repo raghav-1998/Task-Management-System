@@ -81,15 +81,23 @@ const loginUser=async(req,res,next)=>{
 
         const {accessToken,refreshToken}=await generateAccessTokenAndRefreshToken(user._id)
 
-        const loggedInUser=await User.findById(user._id).select("-password,-refreshToken")
+        const loggedInUser=await User.findById(user._id).select("-password -refreshToken")
 
         console.log(loggedInUser)
 
+        const options={
+            httpOnly:true,
+            secure:true
+        }
+
+
         return res
         .status(200)
+        .cookie("accessToken",accessToken,options)
+        .cookie("refreshToken",refreshToken,options)
         .json({
             statusCode:200,
-            data:loggedInUser,accessToken,refreshToken,
+            data:{user:loggedInUser,accessToken,refreshToken},
             message:"User Logged In Successfully"
         })
     }
@@ -98,7 +106,38 @@ const loginUser=async(req,res,next)=>{
     }
 } 
 
+const logoutUser=async(req,res,next)=>{
+    try {
+        await User.findByIdAndUpdate(req.user._id,{
+            $set:{
+                refreshToken:undefined
+            }
+        },{
+            new:true
+        })
+
+        const options={
+            httpOnly:true,
+            secure:true
+        }
+
+        return res
+        .status(200)
+        .clearCookie("accessToken",options)
+        .clearCookie("refreshToken",options)
+        .json({
+            statusCode:200,
+            data:{},
+            message:"User Logged Out Successfully"
+        })
+        
+    } catch (error) {
+        next(error)
+    }
+}
+
 export {
     registerUser,
-    loginUser
+    loginUser,
+    logoutUser
 }
