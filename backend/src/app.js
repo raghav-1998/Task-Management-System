@@ -16,7 +16,10 @@ app.use(express.urlencoded({extended:true,limit:"20kb"}))
 app.use(cookieParser())
 
 import userRouter from './routes/user.routes.js'
+import taskRouter from './routes/task.routes.js'
+
 app.use('/user',userRouter)
+app.use('/task',taskRouter)
 
 export default app;
 
