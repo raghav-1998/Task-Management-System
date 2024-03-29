@@ -136,8 +136,34 @@ const logoutUser=async(req,res,next)=>{
     }
 }
 
+const changeCurrentPassword=async(req,res,next)=>{
+    try {
+        const {oldPassword,newPassword}=req.body
+        const user=await User.findById(req.user?._id)
+        const isPasswordCorrect=await user.isPasswordCorrect(oldPassword)
+
+        if(!isPasswordCorrect){
+            throw new Error("Invalid Old Password")
+        }
+
+        user.password=newPassword
+        await user.save({validateBeforeSave:false})
+
+        return res
+        .status(200)
+        .json({
+            statusCode:200,
+            data:{},
+            message:"Password Change Successfully"
+        })
+    } catch (error) {
+        next(error)
+    }
+}
+
 export {
     registerUser,
     loginUser,
-    logoutUser
+    logoutUser,
+    changeCurrentPassword
 }
