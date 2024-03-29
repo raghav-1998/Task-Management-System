@@ -10,11 +10,14 @@ const taskSchema=mongoose.Schema({
         required:true
     },
     dueDate:{
-        type:Date
+        type:Date,
+        required:true
     },
     priority:{
         type:String,
-        enum:['High','Medium','Low']
+        enum:['High','Medium','Low'],
+        required:true
+
     },
     status:{
         type:String,
